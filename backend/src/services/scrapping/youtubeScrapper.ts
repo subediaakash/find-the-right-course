@@ -4,49 +4,89 @@ interface YouTubeVideo {
   likes: string | null;
   url: string | null;
 }
+
 import { BaseScraper } from "./baseScrape";
 
 export class YouTubeScraper extends BaseScraper {
   async scrape(query: string): Promise<YouTubeVideo[]> {
     try {
       await this.launchBrowser();
-
       if (!this.page) {
         throw new Error("Browser page not initialized");
       }
 
+      // Enable console logs from browser
+      this.page.on("console", (msg) => console.log("Browser Log:", msg.text()));
+
+      await this.page.setViewport({ width: 1280, height: 800 });
+
+      // Navigate to YouTube search results
       await this.page.goto(
         `https://www.youtube.com/results?search_query=${encodeURIComponent(
           query
-        )}`
+        )}`,
+        { waitUntil: "networkidle0" }
       );
+
+      // Wait longer for initial load
+      await this.page.waitForSelector("ytd-video-renderer", { timeout: 10000 });
+
+      // Scroll multiple times to ensure content loads
+      for (let i = 0; i < 3; i++) {
+        await this.page.evaluate(() => {
+          return new Promise((resolve) => {
+            window.scrollBy(0, window.innerHeight);
+            setTimeout(resolve, 1000);
+          });
+        });
+      }
 
       const videos = await this.page.evaluate(() => {
         const results: YouTubeVideo[] = [];
 
-        document.querySelectorAll("ytd-video-renderer").forEach((video) => {
-          const title =
-            video.querySelector("#video-title")?.textContent?.trim() || null;
-          const views =
-            video
-              .querySelector(".inline-metadata-item:last-child")
-              ?.textContent?.trim() || null;
-          const likes =
-            video
-              .querySelector("#menu #top-level-buttons yt-formatted-string")
-              ?.textContent?.trim() || null;
+        // Log the number of video elements found
+        const videoElements = document.querySelectorAll("ytd-video-renderer");
+        console.log(`Found ${videoElements.length} video elements`);
+
+        videoElements.forEach((video, index) => {
+          // Try multiple possible selectors for title
+          const titleElement =
+            video.querySelector("#video-title") ||
+            video.querySelector("yt-formatted-string.ytd-video-renderer");
+
+          // Try multiple possible selectors for views
+          const viewsElement =
+            video.querySelector("#metadata-line span:first-child") ||
+            video.querySelector("span.ytd-video-meta-block");
+
+          const title = titleElement?.textContent?.trim() || null;
+          const views = viewsElement?.textContent?.trim() || null;
           const url =
-            (video.querySelector("#video-title") as HTMLAnchorElement)?.href ||
+            (video.querySelector("a#video-title") as HTMLAnchorElement)?.href ||
+            (video.querySelector("a.ytd-video-renderer") as HTMLAnchorElement)
+              ?.href ||
             null;
 
-          results.push({ title, views, likes, url });
+          console.log(`Video ${index + 1}:`, { title, views, url });
+
+          if (title || views || url) {
+            results.push({ title, views, likes: null, url });
+          }
         });
 
         return results;
       });
 
+      console.log("Scraped videos:", videos.length);
+
+      // Log the first few videos for debugging
+      videos.slice(0, 3).forEach((video, index) => {
+        console.log(`Video ${index + 1}:`, video);
+      });
+
       return this.filterAndSortVideos(videos);
     } catch (error) {
+      console.error("Scraping error:", error);
       throw error instanceof Error
         ? error
         : new Error("Failed to scrape YouTube videos");
@@ -56,31 +96,44 @@ export class YouTubeScraper extends BaseScraper {
   }
 
   private filterAndSortVideos(videos: YouTubeVideo[]): YouTubeVideo[] {
-    return videos
-      .filter((video) => {
-        if (!video.views) return false;
-        const views = this.parseViews(video.views);
-        return !isNaN(views) && views > 10000;
-      })
-      .sort((a, b) => {
-        const viewsA = this.parseViews(a.views || "0");
-        const viewsB = this.parseViews(b.views || "0");
-        return viewsB - viewsA;
+    const filtered = videos.filter((video) => {
+      if (!video.views) return false;
+      const views = this.parseViews(video.views);
+      const isValid = !isNaN(views) && views > 10000;
+      console.log("Filtering video:", {
+        views: video.views,
+        parsedViews: views,
+        isValid,
       });
+      return isValid;
+    });
+
+    console.log(`Filtered from ${videos.length} to ${filtered.length} videos`);
+
+    return filtered.sort((a, b) => {
+      const viewsA = this.parseViews(a.views || "0");
+      const viewsB = this.parseViews(b.views || "0");
+      return viewsB - viewsA;
+    });
   }
 
   private parseViews(views: string): number {
     try {
-      const cleaned = views.replace(/[^0-9.KMk]/g, "").toUpperCase();
+      console.log("Parsing views:", views);
+      const cleaned = views.replace(/[^0-9.KMBk]/g, "").toUpperCase();
+      console.log("Cleaned views:", cleaned);
 
       if (cleaned.includes("K")) {
         return parseFloat(cleaned) * 1000;
       } else if (cleaned.includes("M")) {
         return parseFloat(cleaned) * 1000000;
+      } else if (cleaned.includes("B")) {
+        return parseFloat(cleaned) * 1000000000;
       } else {
         return parseFloat(cleaned);
       }
-    } catch {
+    } catch (error) {
+      console.error("Error parsing views:", error);
       return 0;
     }
   }
