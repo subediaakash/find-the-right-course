@@ -1,68 +1,183 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out;
+    animation-fill-mode: both;
   }
-  a:hover {
-    color: #747bff;
+
+  .animation-delay-200 {
+    animation-delay: 0.2s;
   }
-  button {
-    background-color: #f9f9f9;
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
   }
 }
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.firefly {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.4vw;
+  height: 0.4vw;
+  margin: -0.2vw 0 0 9.8vw;
+  animation: ease 200s alternate infinite;
+  pointer-events: none;
+}
+
+.firefly::before,
+.firefly::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform-origin: -10vw;
+}
+
+.firefly::before {
+  background: black;
+  opacity: 0.4;
+  animation: drift ease alternate infinite;
+}
+
+.firefly::after {
+  background: white;
+  opacity: 0;
+  box-shadow: 0 0 0vw 0vw #ff6600;
+  animation: drift ease alternate infinite, flash ease infinite;
+}
+
+@keyframes drift {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes flash {
+  0%,
+  30%,
+  100% {
+    opacity: 0;
+    box-shadow: 0 0 0vw 0vw #ff6600;
+  }
+  5% {
+    opacity: 1;
+    box-shadow: 0 0 2vw 0.4vw #ff6600;
+  }
+}
+
+.firefly:nth-child(1) {
+  animation-name: move1;
+}
+.firefly:nth-child(2) {
+  animation-name: move2;
+}
+.firefly:nth-child(3) {
+  animation-name: move3;
+}
+.firefly:nth-child(4) {
+  animation-name: move4;
+}
+.firefly:nth-child(5) {
+  animation-name: move5;
+}
+.firefly:nth-child(6) {
+  animation-name: move6;
+}
+.firefly:nth-child(7) {
+  animation-name: move7;
+}
+.firefly:nth-child(8) {
+  animation-name: move8;
+}
+
+@keyframes move1 {
+  0% {
+    transform: translateX(49vw) translateY(-33vh) scale(0.92);
+  }
+  100% {
+    transform: translateX(-27vw) translateY(-30vh) scale(0.27);
+  }
+}
+
+@keyframes move2 {
+  0% {
+    transform: translateX(-8vw) translateY(-6vh) scale(0.55);
+  }
+  100% {
+    transform: translateX(-25vw) translateY(-41vh) scale(0.54);
+  }
+}
+
+@keyframes move3 {
+  0% {
+    transform: translateX(15vw) translateY(-4vh) scale(0.59);
+  }
+  100% {
+    transform: translateX(36vw) translateY(-42vh) scale(0.52);
+  }
+}
+
+@keyframes move4 {
+  0% {
+    transform: translateX(41vw) translateY(24vh) scale(0.56);
+  }
+  100% {
+    transform: translateX(-12vw) translateY(-27vh) scale(0.41);
+  }
+}
+
+@keyframes move5 {
+  0% {
+    transform: translateX(-48vw) translateY(-17vh) scale(0.31);
+  }
+  100% {
+    transform: translateX(41vw) translateY(46vh) scale(0.51);
+  }
+}
+
+@keyframes move6 {
+  0% {
+    transform: translateX(-13vw) translateY(3vh) scale(0.56);
+  }
+  100% {
+    transform: translateX(-25vw) translateY(-14vh) scale(0.74);
+  }
+}
+
+@keyframes move7 {
+  0% {
+    transform: translateX(30vw) translateY(-41vh) scale(0.51);
+  }
+  100% {
+    transform: translateX(-2vw) translateY(4vh) scale(0.65);
+  }
+}
+
+@keyframes move8 {
+  0% {
+    transform: translateX(-42vw) translateY(-17vh) scale(0.57);
+  }
+  100% {
+    transform: translateX(17vw) translateY(31vh) scale(0.66);
+  }
+}
+
