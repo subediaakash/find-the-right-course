@@ -1,6 +1,6 @@
-import { CourseeraScrapper } from "./courseeraScrapper";
+import { CourseraScraper } from "./courseeraScrapper";
 import { UdemyScraper } from "./udemyScrapper";
 
 import { YouTubeScraper } from "./youtubeScrapper";
 
-export { CourseeraScrapper, UdemyScraper, YouTubeScraper };
+export { CourseraScraper, UdemyScraper, YouTubeScraper };

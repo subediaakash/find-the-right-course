@@ -53,4 +53,5 @@ export interface Course {
   title: string | null;
   rating: string | null;
   url: string | null;
+  imageUrl: string | null;
 }

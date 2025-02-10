@@ -38,6 +38,7 @@ export class UdemyScraper extends BaseScraper {
             course
               .querySelector(".star-rating--rating-number")
               ?.textContent?.trim() || null,
+          imageUrl: course.querySelector("img")?.src || null,
         }));
       });
 

@@ -2,7 +2,7 @@ import express from "express";
 import type { Request, Response } from "express";
 import {
   UdemyScraper,
-  CourseeraScrapper,
+  CourseraScraper,
   YouTubeScraper,
 } from "../../services/scrapping";
 
@@ -29,7 +29,7 @@ const handleScrapeRequest = async (
         break;
       }
       case "coursera": {
-        const scraper = new CourseeraScrapper();
+        const scraper = new CourseraScraper();
         data = await scraper.scrape(query as string);
         break;
       }
