@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String?
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  wishlist  Wishlist[]
+  history   History[]
+}
+
+model History {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  title       String
+  description String
+  url         String
+  imageUrl    String
+  platform    Platform
+  createdAt   DateTime @default(now())
+}
+
+model Wishlist {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  title       String
+  description String
+  url         String
+  imageUrl    String
+  platform    Platform
+  createdAt   DateTime @default(now())
+}
+
+enum Platform {
+  UDEMY
+  YOUTUBE
+  COURSERA
+}
