@@ -1,61 +1,47 @@
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { BaseScraper } from "./baseScrape";
 import { Course } from "./baseScrape";
+
+puppeteer.use(StealthPlugin());
 
 export class UdemyScraper extends BaseScraper {
   async scrape(query: string): Promise<Course[]> {
     try {
-      await this.launchBrowser();
+      this.browser = await puppeteer.launch({
+        headless: false,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
 
-      if (!this.page) {
-        throw new Error("Browser page not initialized");
-      }
+      this.page = await this.browser.newPage();
+
+      await this.page.setUserAgent(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+      );
 
       await this.page.goto(
         `https://www.udemy.com/courses/search/?q=${encodeURIComponent(query)}`,
-        {
-          waitUntil: "networkidle0",
-        }
+        { waitUntil: "networkidle2" }
       );
 
-      await this.page.waitForSelector(".course-list--container--3zXPS", {
-        timeout: 10000,
+      await this.page.waitForSelector('div[data-purpose="container"]', {
+        timeout: 30000,
       });
 
-      const courses = await this.page.$$(
-        ".course-list--container--3zXPS .course-card--container--3w8Zm"
-      );
+      const coursesData = await this.page.evaluate(() => {
+        return Array.from(
+          document.querySelectorAll('div[data-purpose="container"]')
+        ).map((course) => ({
+          title: course.querySelector("h3")?.innerText.trim() || null,
+          url: course.querySelector("a")?.href || null,
+          rating:
+            course
+              .querySelector(".star-rating--rating-number")
+              ?.textContent?.trim() || null,
+        }));
+      });
 
-      if (courses.length === 0) {
-        console.warn("No courses found for query:", query);
-      }
-
-      const coursesData = await Promise.all(
-        courses.map(async (course) => {
-          try {
-            const title = await course.$eval(
-              ".udlite-focus-visible-target",
-              (el) => el.textContent?.trim() || ""
-            );
-
-            const rating = await course.$eval(
-              ".star-rating--rating--3lVe8",
-              (el) => el.textContent?.trim() || ""
-            );
-
-            const url = await course.$eval(
-              "a",
-              (el) => (el as HTMLAnchorElement).href || ""
-            );
-
-            return { title, rating, url };
-          } catch (error) {
-            console.error("Error extracting course details:", error);
-            return null;
-          }
-        })
-      );
-
-      return coursesData.filter((course) => course !== null) as Course[];
+      return coursesData.filter((course) => course.title !== null);
     } catch (error) {
       console.error("Scraping error:", error);
       throw error;

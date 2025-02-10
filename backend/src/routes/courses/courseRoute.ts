@@ -1,7 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
 import {
-  UdemyScrapper,
+  UdemyScraper,
   CourseeraScrapper,
   YouTubeScraper,
 } from "../../services/scrapping";
@@ -24,7 +24,7 @@ const handleScrapeRequest = async (
 
     switch (platform as string) {
       case "udemy": {
-        const scraper = new UdemyScrapper();
+        const scraper = new UdemyScraper();
         data = await scraper.scrape(query as string);
         break;
       }
