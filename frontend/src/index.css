@@ -2,182 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .animate-fade-in-up {
-    animation: fade-in-up 0.5s ease-out;
-    animation-fill-mode: both;
-  }
-
-  .animation-delay-200 {
-    animation-delay: 0.2s;
-  }
-
-  .animation-delay-400 {
-    animation-delay: 0.4s;
+@layer base {
+  :root {
+    --background: 20 14.3% 4.1%;
+    --primary: 24 96% 53%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --card: 20 14.3% 4.1%;
+    --card-foreground: 60 9.1% 97.8%;
   }
 }
 
-@keyframes fade-in-up {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
+@layer base {
+  body {
+    @apply bg-background text-primary-foreground;
   }
 }
 
-.firefly {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0.4vw;
-  height: 0.4vw;
-  margin: -0.2vw 0 0 9.8vw;
-  animation: ease 200s alternate infinite;
-  pointer-events: none;
+.gradient-bg {
+  background: radial-gradient(circle at top center, #ff6b0080 0%, transparent 50%),
+              radial-gradient(circle at bottom left, #ff450080 0%, transparent 50%);
 }
 
-.firefly::before,
-.firefly::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  transform-origin: -10vw;
+.hero-gradient {
+  background: linear-gradient(to right, rgba(255, 107, 0, 0.1), rgba(255, 69, 0, 0.1));
 }
-
-.firefly::before {
-  background: black;
-  opacity: 0.4;
-  animation: drift ease alternate infinite;
-}
-
-.firefly::after {
-  background: white;
-  opacity: 0;
-  box-shadow: 0 0 0vw 0vw #ff6600;
-  animation: drift ease alternate infinite, flash ease infinite;
-}
-
-@keyframes drift {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes flash {
-  0%,
-  30%,
-  100% {
-    opacity: 0;
-    box-shadow: 0 0 0vw 0vw #ff6600;
-  }
-  5% {
-    opacity: 1;
-    box-shadow: 0 0 2vw 0.4vw #ff6600;
-  }
-}
-
-.firefly:nth-child(1) {
-  animation-name: move1;
-}
-.firefly:nth-child(2) {
-  animation-name: move2;
-}
-.firefly:nth-child(3) {
-  animation-name: move3;
-}
-.firefly:nth-child(4) {
-  animation-name: move4;
-}
-.firefly:nth-child(5) {
-  animation-name: move5;
-}
-.firefly:nth-child(6) {
-  animation-name: move6;
-}
-.firefly:nth-child(7) {
-  animation-name: move7;
-}
-.firefly:nth-child(8) {
-  animation-name: move8;
-}
-
-@keyframes move1 {
-  0% {
-    transform: translateX(49vw) translateY(-33vh) scale(0.92);
-  }
-  100% {
-    transform: translateX(-27vw) translateY(-30vh) scale(0.27);
-  }
-}
-
-@keyframes move2 {
-  0% {
-    transform: translateX(-8vw) translateY(-6vh) scale(0.55);
-  }
-  100% {
-    transform: translateX(-25vw) translateY(-41vh) scale(0.54);
-  }
-}
-
-@keyframes move3 {
-  0% {
-    transform: translateX(15vw) translateY(-4vh) scale(0.59);
-  }
-  100% {
-    transform: translateX(36vw) translateY(-42vh) scale(0.52);
-  }
-}
-
-@keyframes move4 {
-  0% {
-    transform: translateX(41vw) translateY(24vh) scale(0.56);
-  }
-  100% {
-    transform: translateX(-12vw) translateY(-27vh) scale(0.41);
-  }
-}
-
-@keyframes move5 {
-  0% {
-    transform: translateX(-48vw) translateY(-17vh) scale(0.31);
-  }
-  100% {
-    transform: translateX(41vw) translateY(46vh) scale(0.51);
-  }
-}
-
-@keyframes move6 {
-  0% {
-    transform: translateX(-13vw) translateY(3vh) scale(0.56);
-  }
-  100% {
-    transform: translateX(-25vw) translateY(-14vh) scale(0.74);
-  }
-}
-
-@keyframes move7 {
-  0% {
-    transform: translateX(30vw) translateY(-41vh) scale(0.51);
-  }
-  100% {
-    transform: translateX(-2vw) translateY(4vh) scale(0.65);
-  }
-}
-
-@keyframes move8 {
-  0% {
-    transform: translateX(-42vw) translateY(-17vh) scale(0.57);
-  }
-  100% {
-    transform: translateX(17vw) translateY(31vh) scale(0.66);
-  }
-}
-

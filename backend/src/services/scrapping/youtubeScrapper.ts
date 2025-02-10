@@ -15,12 +15,10 @@ export class YouTubeScraper extends BaseScraper {
         throw new Error("Browser page not initialized");
       }
 
-      // Enable console logs from browser
       this.page.on("console", (msg) => console.log("Browser Log:", msg.text()));
 
       await this.page.setViewport({ width: 1280, height: 800 });
 
-      // Navigate to YouTube search results
       await this.page.goto(
         `https://www.youtube.com/results?search_query=${encodeURIComponent(
           query
@@ -28,10 +26,8 @@ export class YouTubeScraper extends BaseScraper {
         { waitUntil: "networkidle0" }
       );
 
-      // Wait longer for initial load
       await this.page.waitForSelector("ytd-video-renderer", { timeout: 10000 });
 
-      // Scroll multiple times to ensure content loads
       for (let i = 0; i < 3; i++) {
         await this.page.evaluate(() => {
           return new Promise((resolve) => {
@@ -44,17 +40,14 @@ export class YouTubeScraper extends BaseScraper {
       const videos = await this.page.evaluate(() => {
         const results: YouTubeVideo[] = [];
 
-        // Log the number of video elements found
         const videoElements = document.querySelectorAll("ytd-video-renderer");
         console.log(`Found ${videoElements.length} video elements`);
 
         videoElements.forEach((video, index) => {
-          // Try multiple possible selectors for title
           const titleElement =
             video.querySelector("#video-title") ||
             video.querySelector("yt-formatted-string.ytd-video-renderer");
 
-          // Try multiple possible selectors for views
           const viewsElement =
             video.querySelector("#metadata-line span:first-child") ||
             video.querySelector("span.ytd-video-meta-block");
@@ -79,7 +72,6 @@ export class YouTubeScraper extends BaseScraper {
 
       console.log("Scraped videos:", videos.length);
 
-      // Log the first few videos for debugging
       videos.slice(0, 3).forEach((video, index) => {
         console.log(`Video ${index + 1}:`, video);
       });
