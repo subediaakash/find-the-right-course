@@ -25,11 +25,9 @@ export abstract class BaseScraper {
 
     this.page = await this.browser.newPage();
 
-    // Set a random user agent
     const randomUserAgent = this.getRandomUserAgent();
     await this.page.setUserAgent(randomUserAgent);
 
-    // Set headers to mimic real browsing
     await this.page.setExtraHTTPHeaders({
       "Accept-Language": "en-US,en;q=0.9",
       "Upgrade-Insecure-Requests": "1",
