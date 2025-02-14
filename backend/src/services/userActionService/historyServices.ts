@@ -5,7 +5,6 @@ export class HistoryService {
   public static async addToHistory(
     userId: string,
     title: string,
-    description: string,
     url: string,
     imageUrl: string,
     platform: Platform
@@ -26,7 +25,6 @@ export class HistoryService {
           },
         },
         title,
-        description,
         url,
         imageUrl,
         platform,

@@ -5,7 +5,6 @@ export class WishListService {
   public static async addCourseToTheWishlist(
     userId: string,
     title: string,
-    description: string,
     url: string,
     imageUrl: string,
     platform: Platform
@@ -38,7 +37,6 @@ export class WishListService {
           },
         },
         title,
-        description,
         url,
         imageUrl,
         platform,

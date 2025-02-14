@@ -19,27 +19,25 @@ model User {
 }
 
 model History {
-  id          String   @id @default(cuid())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String
-  title       String
-  description String
-  url         String
-  imageUrl    String
-  platform    Platform
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  title     String
+  url       String
+  imageUrl  String
+  platform  Platform
+  createdAt DateTime @default(now())
 }
 
 model Wishlist {
-  id          String   @id @default(cuid())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String
-  title       String
-  description String
-  url         String
-  imageUrl    String
-  platform    Platform
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  title     String
+  url       String
+  imageUrl  String
+  platform  Platform
+  createdAt DateTime @default(now())
 }
 
 enum Platform {
