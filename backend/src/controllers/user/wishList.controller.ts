@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { WishListService } from "../../services/userActionServices/whishListServices";
 import { Platform } from "@prisma/client";
 
-export class UserActionsController {
+export class WishListController {
   async addCourseToTheWishlist(req: Request, res: Response): Promise<void> {
     const { title, description, url, imageUrl, platform } = req.body;
     const { userId } = res.locals.user;

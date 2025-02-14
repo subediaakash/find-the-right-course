@@ -5,7 +5,6 @@ import { UserSchema } from "../../zod/user.zod";
 import { prisma } from "../../utils/prisma";
 
 export class UserAuthController {
-  //signup method
   async signup(req: Request, res: Response): Promise<void> {
     const { name, email, password } = req.body as User;
 
@@ -45,7 +44,6 @@ export class UserAuthController {
     return;
   }
 
-  // signin method
   async signin(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body as User;
 
