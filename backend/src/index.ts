@@ -1,16 +1,19 @@
 import express from "express";
 import { Request, Response } from "express";
-import router from "./routes/courses/courseRoute";
+import courseRouter from "./routes/courses/courseRoute";
 import userRouter from "./routes/user/userRoute";
 import authRouter from "./routes/auth/authRoute";
+import cors from "cors";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.use("/api", router);
+app.use(cors());
+
 app.use("/api/auth", authRouter);
+app.use("/api/course", courseRouter);
 app.use("/api/user", userRouter);
 
 app.use(
