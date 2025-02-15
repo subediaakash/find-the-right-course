@@ -4,6 +4,14 @@ import { User } from "@prisma/client";
 import { UserSchema } from "../../zod/user.zod";
 import { prisma } from "../../utils/prisma";
 
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict" as const,
+  maxAge: 24 * 60 * 60 * 1000,
+  path: "/",
+};
+
 export class UserAuthController {
   async signup(req: Request, res: Response): Promise<void> {
     const { name, email, password } = req.body as User;
@@ -33,13 +41,15 @@ export class UserAuthController {
       }
     );
 
+    res.cookie("auth_token", token, COOKIE_OPTIONS);
+
     res.json({
       message: "User created successfully",
       data: {
         name: user.name,
         email: user.email,
+        token: token,
       },
-      token,
     });
     return;
   }
@@ -76,13 +86,29 @@ export class UserAuthController {
       }
     );
 
+    res.cookie("auth_token", token, COOKIE_OPTIONS);
+
     res.json({
       message: "User signed in successfully",
       data: {
         name: user.name,
         email: user.email,
+        token: token,
       },
-      token,
+    });
+    return;
+  }
+
+  async logout(_req: Request, res: Response): Promise<void> {
+    res.clearCookie("auth_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    });
+
+    res.json({
+      message: "Logged out successfully",
     });
     return;
   }

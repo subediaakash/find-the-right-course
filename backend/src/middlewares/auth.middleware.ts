@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../utils/prisma";
 
 declare global {
   namespace Express {
@@ -26,17 +25,10 @@ export const verifyToken = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      res.status(401).json({ error: "Authorization header missing" });
-      return;
-    }
-
-    const token = authHeader.split(" ")[1];
+    const token = req.cookies.auth_token;
 
     if (!token) {
-      res.status(401).json({ error: "No token provided" });
+      res.status(401).json({ error: "Authentication required" });
       return;
     }
 
@@ -59,9 +51,16 @@ export const verifyToken = async (
     });
 
     if (!user) {
+      res.clearCookie("auth_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+      });
       res.status(401).json({ error: "User not found" });
       return;
     }
+
     req.user = {
       id: user.id,
       email: user.email,
@@ -72,6 +71,12 @@ export const verifyToken = async (
     console.error("Authentication error:", error);
 
     if (error instanceof jwt.JsonWebTokenError) {
+      res.clearCookie("auth_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+      });
       res.status(401).json({ error: "Invalid token" });
     } else {
       res.status(500).json({ error: "Authentication failed" });
