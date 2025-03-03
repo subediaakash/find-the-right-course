@@ -33,31 +33,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(true);
         const token = getToken();
 
-        if (token) {
-          try {
-            const decoded = jwtDecode<JwtPayload>(token);
+        if (!token) {
+          setUser(null);
+          setIsAuthenticated(false);
+          return;
+        }
 
-            const currentTime = Date.now() / 1000;
-            if (decoded.exp < currentTime) {
-              setUser(null);
-              setIsAuthenticated(false);
-              return;
-            }
+        try {
+          const decoded = jwtDecode<JwtPayload>(token);
+          const currentTime = Date.now() / 1000;
 
-            const userData: User = {
-              id: decoded.userId,
-              email: decoded.email,
-              name: decoded.name,
-            };
-
-            setUser(userData);
-            setIsAuthenticated(true);
-          } catch (error: any) {
+          if (decoded.exp < currentTime) {
             setUser(null);
             setIsAuthenticated(false);
-            console.error(error);
+            return;
           }
-        } else {
+
+          const userData: User = {
+            id: decoded.userId,
+            email: decoded.email,
+            name: decoded.name,
+          };
+
+          setUser(userData);
+          setIsAuthenticated(true);
+        } catch (error) {
+          console.error("Token decoding error:", error);
           setUser(null);
           setIsAuthenticated(false);
         }
