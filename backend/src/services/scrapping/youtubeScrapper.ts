@@ -3,7 +3,7 @@ interface YouTubeVideo {
   views: string | null;
   likes: string | null;
   url: string | null;
-  thumbnailUrl: string | null; // Added thumbnail URL field
+  imageUrl: string | null;
 }
 
 import { BaseScraper } from "./baseScrape";
@@ -21,7 +21,7 @@ export class YouTubeScraper extends BaseScraper {
       await this.page.setViewport({ width: 1280, height: 800 });
 
       await this.page.goto(
-        `https://www.youtube.com/results?search_query=${encodeURIComponent(
+        `https://www.youtube.com/results?search_query=learn + ${encodeURIComponent(
           query
         )}`,
         { waitUntil: "networkidle0" }
@@ -63,7 +63,6 @@ export class YouTubeScraper extends BaseScraper {
               ?.href ||
             null;
 
-          // Get the highest quality thumbnail URL
           const thumbnailUrl =
             thumbnailElement?.getAttribute("src") ||
             thumbnailElement?.getAttribute("data-thumb") ||
@@ -82,7 +81,7 @@ export class YouTubeScraper extends BaseScraper {
               views,
               likes: null,
               url,
-              thumbnailUrl,
+              imageUrl: thumbnailUrl,
             });
           }
         });

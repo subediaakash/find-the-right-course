@@ -12,7 +12,11 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+  })
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/course", courseRouter);
