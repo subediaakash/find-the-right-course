@@ -6,10 +6,10 @@ import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
-import Auth from "./pages/Auth";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./auth/authProvider";
 import { SignIn } from "./components/SignInForm";
+import { SignUp } from "./components/SignupForm";
 
 function App() {
   return (
@@ -20,6 +20,7 @@ function App() {
             <Navbar />
             <Routes>
               <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route path="/" element={<Home />} />
               <Route
                 path="/search"
@@ -29,10 +30,30 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/wishlist"
+                element={
+                  <ProtectedRoute>
+                    <Wishlist />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/history"
+                element={
+                  <ProtectedRoute>
+                    <History />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </div>
         </Router>
