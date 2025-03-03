@@ -1,4 +1,4 @@
-import puppeteer, { Browser, executablePath, Page } from "puppeteer";
+import puppeteer, { Browser, Page } from "puppeteer";
 
 export abstract class BaseScraper {
   protected browser: Browser | null = null;
@@ -18,9 +18,14 @@ export abstract class BaseScraper {
 
   async launchBrowser() {
     this.browser = await puppeteer.launch({
-      headless: false,
+      headless: true, // Use boolean true for older versions of Puppeteer
       executablePath: "/usr/bin/chromium-browser",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+      ],
     });
 
     this.page = await this.browser.newPage();
