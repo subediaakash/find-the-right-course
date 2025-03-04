@@ -1,8 +1,9 @@
 import type React from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaSearch, FaYoutube, FaBook, FaVideo } from "react-icons/fa";
+import { FaSearch, FaYoutube, FaBook, FaVideo, FaHeart } from "react-icons/fa";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 interface Course {
   title: string;
@@ -20,6 +21,10 @@ interface LoadingState {
 
 interface ErrorState {
   [key: string]: string | null;
+}
+
+interface WishlistState {
+  [key: string]: { [courseIndex: number]: boolean };
 }
 
 const platforms = [
@@ -41,6 +46,7 @@ const Search: React.FC = () => {
   const [loading, setLoading] = useState<LoadingState>({});
   const [error, setError] = useState<ErrorState>({});
   const [searched, setSearched] = useState<boolean>(false);
+  const [wishlist, setWishlist] = useState<WishlistState>({});
 
   const togglePlatform = (platform: string) => {
     setSelectedPlatforms((prev) => ({ ...prev, [platform]: !prev[platform] }));
@@ -51,6 +57,7 @@ const Search: React.FC = () => {
     setSearched(true);
     setCourses({});
     setError({});
+    setWishlist({});
 
     const activePlatforms = Object.keys(selectedPlatforms).filter(
       (platform) => selectedPlatforms[platform]
@@ -69,6 +76,12 @@ const Search: React.FC = () => {
         setCourses((prev) => ({
           ...prev,
           [platform]: response.data.slice(0, 5),
+        }));
+        setWishlist((prev) => ({
+          ...prev,
+          [platform]: Object.fromEntries(
+            response.data.slice(0, 5).map((_, index) => [index, false])
+          ),
         }));
       } catch (err) {
         setError((prev) => ({
@@ -100,6 +113,64 @@ const Search: React.FC = () => {
     } catch (err) {
       console.error("Failed to record history:", err);
       window.open(course.url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const addToWishlist = async (
+    e: React.MouseEvent,
+    course: Course,
+    platform: string,
+    index: number
+  ) => {
+    e.stopPropagation();
+
+    setWishlist((prev) => ({
+      ...prev,
+      [platform]: {
+        ...prev[platform],
+        [index]: true,
+      },
+    }));
+
+    try {
+      await axios.post(
+        "http://localhost:3000/api/user/wishlist/add",
+        {
+          title: course.title,
+          url: course.url,
+          imageUrl: course.imageUrl,
+          platform: platform.toUpperCase(),
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      toast.success("Course added to wishlist!", {
+        duration: 3000,
+        position: "bottom-right",
+        style: {
+          background: "#1E1E1E",
+          color: "#fff",
+          border: "1px solid #333",
+        },
+        icon: "❤️",
+      });
+    } catch (err) {
+      // Revert optimistic update on failure
+      setWishlist((prev) => ({
+        ...prev,
+        [platform]: {
+          ...prev[platform],
+          [index]: false,
+        },
+      }));
+
+      console.error("Failed to add to wishlist:", err);
+      toast.error("Failed to add to wishlist", {
+        duration: 3000,
+        position: "bottom-right",
+      });
     }
   };
 
@@ -314,6 +385,23 @@ const Search: React.FC = () => {
                               alt={course.title}
                               className="w-full h-40 object-cover"
                             />
+                            <button
+                              onClick={(e) =>
+                                addToWishlist(e, course, id, index)
+                              }
+                              className={`absolute top-2 right-2 p-2 rounded-full ${
+                                wishlist[id]?.[index]
+                                  ? "bg-red-600 text-white"
+                                  : "bg-black/70 text-white hover:bg-red-600/80 hover:text-white"
+                              } transition-colors z-10`}
+                              aria-label="Add to wishlist"
+                            >
+                              <FaHeart
+                                className={`w-4 h-4 ${
+                                  wishlist[id]?.[index] ? "animate-pulse" : ""
+                                }`}
+                              />
+                            </button>
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
                           </div>
                           <div className="p-6">

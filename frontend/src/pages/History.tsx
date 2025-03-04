@@ -2,9 +2,17 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { History as HistoryIcon } from "lucide-react";
 
-const History = () => {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+interface Course {
+  id: string;
+  title: string;
+  platform: string;
+  imageUrl: string;
+  url: string;
+}
+
+const History: React.FC = () => {
+  const [history, setHistory] = useState<Course[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -22,9 +30,12 @@ const History = () => {
         }
 
         const result = await response.json();
-        setHistory(result?.data?.history?.slice(-10) ?? []);
+        // Ensure the fetched data matches the Course interface
+        const fetchedHistory: Course[] =
+          result?.data?.history?.slice(-10) ?? [];
+        setHistory(fetchedHistory);
       } catch (error) {
-        console.error(error.message);
+        console.error((error as Error).message); // Cast error to Error type
       } finally {
         setLoading(false);
       }
@@ -53,7 +64,7 @@ const History = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {history.map((course) => (
+            {history.map((course: Course) => (
               <motion.div
                 key={course.id}
                 className="bg-[#1a1a1a] p-4 rounded-lg shadow-md hover:shadow-xl transition duration-300 flex items-center gap-4"

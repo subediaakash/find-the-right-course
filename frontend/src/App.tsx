@@ -10,6 +10,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./auth/authProvider";
 import { SignIn } from "./components/SignInForm";
 import { SignUp } from "./components/SignupForm";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -35,6 +36,8 @@ function App() {
                 path="/wishlist"
                 element={
                   <ProtectedRoute>
+                    <Toaster />
+
                     <Wishlist />
                   </ProtectedRoute>
                 }
