@@ -12,7 +12,7 @@ export class CourseraScraper extends BaseScraper {
       );
 
       await this.page.waitForSelector(".cds-ProductCard-gridCard", {
-        timeout: 10000,
+        timeout: 15000,
       });
 
       const courses = await this.page.$$(".cds-ProductCard-gridCard");
