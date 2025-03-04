@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -84,6 +82,27 @@ const Search: React.FC = () => {
     });
   };
 
+  const trackAndRedirect = async (course: Course, platform: string) => {
+    try {
+      await axios.post(
+        "http://localhost:3000/api/user/history/add",
+        {
+          title: course.title,
+          url: course.url,
+          imageUrl: course.imageUrl,
+          platform: platform.toUpperCase(),
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      window.open(course.url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      console.error("Failed to record history:", err);
+      window.open(course.url, "_blank", "noopener,noreferrer");
+    }
+  };
+
   // Skeleton loader for course cards
   const SkeletonLoader = () => {
     return (
@@ -130,7 +149,6 @@ const Search: React.FC = () => {
     );
   };
 
-  // Platform loading indicator
   const PlatformLoader = ({ name }: { name: string }) => {
     return (
       <div className="flex items-center justify-center py-6">
@@ -278,12 +296,10 @@ const Search: React.FC = () => {
                   {!loading[id] && courses[id]?.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {courses[id]?.map((course, index) => (
-                        <motion.a
+                        <motion.div
                           key={index}
-                          href={course.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block bg-black/40 rounded-xl overflow-hidden hover:shadow-lg hover:shadow-orange-900/20 transition-all duration-300 transform hover:-translate-y-1"
+                          onClick={() => trackAndRedirect(course, id)}
+                          className="block bg-black/40 rounded-xl overflow-hidden hover:shadow-lg hover:shadow-orange-900/20 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                           initial={{ opacity: 0, y: 20 }}
                           animate={{
                             opacity: 1,
@@ -305,7 +321,7 @@ const Search: React.FC = () => {
                               {course.title}
                             </h3>
                           </div>
-                        </motion.a>
+                        </motion.div>
                       ))}
                     </div>
                   )}
@@ -334,4 +350,3 @@ const Search: React.FC = () => {
 };
 
 export default Search;
-  
