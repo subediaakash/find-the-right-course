@@ -13,6 +13,7 @@ interface Course {
 const History: React.FC = () => {
   const [history, setHistory] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isClearing, setClearing] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -30,12 +31,11 @@ const History: React.FC = () => {
         }
 
         const result = await response.json();
-        // Ensure the fetched data matches the Course interface
         const fetchedHistory: Course[] =
           result?.data?.history?.slice(-10) ?? [];
         setHistory(fetchedHistory);
       } catch (error) {
-        console.error((error as Error).message); // Cast error to Error type
+        console.error((error as Error).message);
       } finally {
         setLoading(false);
       }
@@ -43,6 +43,33 @@ const History: React.FC = () => {
 
     fetchHistory();
   }, []);
+
+  const handleClearHistory = async () => {
+    setClearing(true);
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/user/history/clear",
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to clear history");
+      }
+
+      setHistory([]);
+    } catch (error) {
+      console.error((error as Error).message);
+      alert("Failed to clear history. Please try again.");
+    } finally {
+      setClearing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-[#20120f] to-black text-white px-6 md:px-16 py-10">
@@ -63,35 +90,46 @@ const History: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {history.map((course: Course) => (
-              <motion.div
-                key={course.id}
-                className="bg-[#1a1a1a] p-4 rounded-lg shadow-md hover:shadow-xl transition duration-300 flex items-center gap-4"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: "spring", stiffness: 100 }}
+          <div>
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={handleClearHistory}
+                disabled={isClearing}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors disabled:bg-orange-700 disabled:cursor-not-allowed"
               >
-                <img
-                  src={course.imageUrl}
-                  alt={course.title}
-                  className="w-24 h-24 rounded-md object-cover"
-                />
-                <div>
-                  <a
-                    href={course.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                  >
-                    <h3 className="text-lg font-semibold">{course.title}</h3>
-                    <p className="text-orange-400 text-sm mt-1">
-                      {course.platform}
-                    </p>
-                  </a>
-                </div>
-              </motion.div>
-            ))}
+                {isClearing ? "Clearing..." : "Clear History"}
+              </button>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {history.map((course: Course) => (
+                <motion.div
+                  key={course.id}
+                  className="bg-[#1a1a1a] p-4 rounded-lg shadow-md hover:shadow-xl transition duration-300 flex items-center gap-4"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ type: "spring", stiffness: 100 }}
+                >
+                  <img
+                    src={course.imageUrl}
+                    alt={course.title}
+                    className="w-24 h-24 rounded-md object-cover"
+                  />
+                  <div>
+                    <a
+                      href={course.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <h3 className="text-lg font-semibold">{course.title}</h3>
+                      <p className="text-orange-400 text-sm mt-1">
+                        {course.platform}
+                      </p>
+                    </a>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         )}
       </div>
