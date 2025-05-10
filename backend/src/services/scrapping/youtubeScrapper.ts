@@ -24,10 +24,10 @@ export class YouTubeScraper extends BaseScraper {
         `https://www.youtube.com/results?search_query=learn + ${encodeURIComponent(
           query
         )}`,
-        { waitUntil: "networkidle0" }
+        { waitUntil: "domcontentloaded" }
       );
 
-      await this.page.waitForSelector("ytd-video-renderer", { timeout: 10000 });
+      await this.page.waitForSelector("ytd-video-renderer", { timeout: 20000 });
 
       for (let i = 0; i < 3; i++) {
         await this.page.evaluate(() => {
